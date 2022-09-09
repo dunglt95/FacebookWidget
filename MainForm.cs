@@ -75,13 +75,15 @@ namespace FacebookWidget
 
             Disposed += MainForm_Disposed;
 
-            SetStyle(ControlStyles.SupportsTransparentBackColor, true);
-            BackColor = Color.Transparent;
+            BackColor = Color.White;
+            TransparencyKey = Color.White;
 
             ServicePointManager.SecurityProtocol = (SecurityProtocolType)(768 | 3072);
             SystemEvents.DisplaySettingsChanged += SystemEvents_DisplaySettingsChanged;
 
             Application.AddMessageFilter(this);
+
+            picAvatar.Paint += picAvatar_Paint;
         }
 
         #endregion constructors
@@ -95,6 +97,25 @@ namespace FacebookWidget
         #endregion properties
 
         #region events
+
+        private void picAvatar_Paint(object sender, PaintEventArgs e)
+        {
+            e.Graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
+
+            var _ellipseSize = new Size(Helpers.toCurrentDpi(6), Helpers.toCurrentDpi(6));
+            var _rect = new Rectangle(
+                picAvatar.ClientRectangle.Right - _ellipseSize.Width,
+                picAvatar.ClientRectangle.Top,
+                _ellipseSize.Width, _ellipseSize.Height);
+            _rect.Offset(-3, 2);
+
+            using (var _brush = new SolidBrush(userInfo.IsOnline.GetValueOrDefault(false) ?
+                    Color.FromArgb(52, 173, 122) : Color.FromArgb(118, 137, 150)))
+                e.Graphics.FillEllipse(_brush, _rect);
+
+            using (var _pen = new Pen(Color.White, 1))
+                e.Graphics.DrawEllipse(_pen, _rect);
+        }
 
         private void MainForm_Disposed(object sender, EventArgs e)
         {
@@ -141,18 +162,6 @@ namespace FacebookWidget
                 //}
 
                 userInfo = new UserInfo(_zUserId, null, null, _zCookie);
-
-                try
-                {
-                    //BackColor = Color.FromName(_configData.Read("TransparencyKey", "Config"));
-                    //TransparencyKey = Color.FromName(_configData.Read("TransparencyKey", "Config"));
-                }
-                catch
-                {
-                    MessageBox.Show("Unsupported color name '" + _configData.Read("TransparencyKey", "Config") + "' in TransparencyKey", "FacebookWidget",
-                        MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    Application.Exit();
-                }
             }
             else
             {
@@ -286,11 +295,12 @@ namespace FacebookWidget
                         if (!string.IsNullOrEmpty(userInfo.Cookie))
                             _bInitialized = true;
                     }
+                }
 
+                if (_bInitialized)
+                {
                     var _zContent = string.Empty;
                     userInfo.Status = "0 unread messages";
-
-                    //var _node = _htmlDocument.DocumentNode.SelectSingleNode("//a[contains(@href, 'messages')]");
 
                     _zContent = _htmlDocument.DocumentNode.SelectSingleNode("//a[contains(@href, 'messages')]")?.InnerText;
 
@@ -314,8 +324,6 @@ namespace FacebookWidget
                             nMesseageCount = int.Parse(p.Substring(0, p.IndexOf(")")));
                         }
                     }
-
-                    _bInitialized = false;
                 }
             }
             catch (Exception ex)

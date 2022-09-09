@@ -102,7 +102,7 @@
             this.picAvatar.Name = "picAvatar";
             this.pnlContainer.SetRowSpan(this.picAvatar, 2);
             this.picAvatar.Size = new System.Drawing.Size(32, 74);
-            this.picAvatar.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage;
+            this.picAvatar.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
             this.picAvatar.TabIndex = 3;
             this.picAvatar.TabStop = false;
             // 
@@ -131,7 +131,6 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
             this.ClientSize = new System.Drawing.Size(344, 82);
             this.Controls.Add(this.pnlContainer);
-            this.DoubleBuffered = true;
             this.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
             this.MaximizeBox = false;
